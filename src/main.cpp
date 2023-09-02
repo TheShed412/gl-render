@@ -19,7 +19,6 @@ int main(int argc, char **argv)
 
     Core::Init::InitSDL::init(window, context);
     Core::IListener* scene = new TestScene(window);
-    std::cout << "SDL SCENE" << std::endl;
     Core::Init::InitSDL::setListener(scene);
     Core::Init::InitSDL::run();
     

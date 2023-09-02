@@ -29,7 +29,7 @@ void InitSDL::init(const Core::WindowInfo& windowInfo,
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    SDL_SetRelativeMouseMode(SDL_FALSE);// TODO: make this a config option
 
     flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
