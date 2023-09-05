@@ -68,6 +68,8 @@ void TestScene::setupVBO() {
     // If something is changed a lot on draw, then we will want to tell the GPU that so it can optimize
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    // Setup the ebo which allows us to use indecies on the vertex array so we don't need to send multiople of the same vertex
+    // Setup is the same as all other buffers as explained above
     glGenBuffers(1, &this->ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(eboIndecies), eboIndecies, GL_STATIC_DRAW);
@@ -130,11 +132,12 @@ void TestScene::setupVBO() {
             infoLog << std::endl;
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void TestScene::renderVBO() {
     glBindVertexArray(vao);
+    // Use drawElements so opengl knows we are using an ebo
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
