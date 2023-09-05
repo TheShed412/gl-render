@@ -22,15 +22,26 @@ class TestScene : public IListener {
         " FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
         "}\0";
 
-        float vertices[9];
+        // The benefit of the ebo is, originally, we'd have 18 float in this to define 
+        // already shared verts, with the ebo and being able to define indecies, we only need
+        // the unique verts
+        // This isn't a spectacular demo of the space saving since the total size of the ebo+fbo is the same as
+        // an fbo that does the same thing. But on larger objects that have more shared verts, it gets much better
+        float vertices[12];
         unsigned int vbo;
         unsigned int vao;
+
+        // An array storing the order of the indecies to draw, referencing the above array
+        unsigned int eboIndecies[6];
+        unsigned int ebo;
 
         unsigned int vShader;
         unsigned int fShader;
         unsigned int shaderProg;
 
         // TRIANGLE STUFF //
+        void setupVBO();
+        void renderVBO();
 
     public:
         void notifyBeginFrame() override;

@@ -10,16 +10,40 @@
  * construct objects...yet
  */
 TestScene::TestScene() {
+    this->setupVBO();
+};
+
+void TestScene::setupVBO() {
     // Just setting points, all in normal device coords
-    vertices[0] = -0.5f;
-    vertices[1] = -0.5f;
-    vertices[2] = 0.0f;
-    vertices[3] = 0.5f;
-    vertices[4] = -0.5f;
-    vertices[5] = 0.0f;
-    vertices[6] = 0.0f;
-    vertices[7] = 0.5f;
-    vertices[8] = 0.0f;
+    // Top right of rectangle "0"
+    vertices[0] = 0.5;
+    vertices[1] = 0.5;
+    vertices[2] = 0;
+
+    // Bottom right of rectangle "1"
+    vertices[3] = 0.5;
+    vertices[4] = -0.5;
+    vertices[5] = 0;
+
+    // Bottom left of rectangle "2"
+    vertices[6] = -0.5;
+    vertices[7] = -0.5;
+    vertices[8] = 0;
+
+    // Top left of rectangle "3"
+    vertices[9] = -0.5;
+    vertices[10] = 0.5;
+    vertices[11] = 0;
+
+    // Now we order the vertecies in the order they will connect, essentially
+    // First 3 are the first triangle of the rectangle
+    eboIndecies[0] = 0;
+    eboIndecies[1] = 1;
+    eboIndecies[2] = 3;
+    // 2nd 3 are the 2nd traiangle of the rectangle
+    eboIndecies[3] = 1;
+    eboIndecies[4] = 2;
+    eboIndecies[5] = 3;
     
     // Boy here are VAOs
     // What the VAO seems to do is almost keep track of state assigned once it binds
@@ -43,6 +67,10 @@ TestScene::TestScene() {
     // • GL_DYNAMIC_DRAW: the data is changed a lot and used many times.
     // If something is changed a lot on draw, then we will want to tell the GPU that so it can optimize
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &this->ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(eboIndecies), eboIndecies, GL_STATIC_DRAW);
 
     // Now we need to describe how things are stored in the vertex buffers so the right
     // data can be read from the shader
@@ -102,7 +130,15 @@ TestScene::TestScene() {
             infoLog << std::endl;
     }
 
-};
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+
+void TestScene::renderVBO() {
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 
 /**
  * @brief Things to do at the beginning of the frame
@@ -120,8 +156,7 @@ void TestScene::notifyDisplayFrame() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProg);
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    this->renderVBO();
 };
 
 void TestScene::notifyKeyboardInput(unsigned char key, bool pressed) {};
