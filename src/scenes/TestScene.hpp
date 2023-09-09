@@ -1,6 +1,7 @@
 #pragma
 #include <WindowInfo.hpp>
 #include <IListener.hpp>
+#include <Types.hpp>
 
 using namespace Core;
 
@@ -27,7 +28,7 @@ class TestScene : public IListener {
         // the unique verts
         // This isn't a spectacular demo of the space saving since the total size of the ebo+fbo is the same as
         // an fbo that does the same thing. But on larger objects that have more shared verts, it gets much better
-        float vertices[12];
+        shed::vec3 verts[4];
         unsigned int vbo;
         unsigned int vao;
 

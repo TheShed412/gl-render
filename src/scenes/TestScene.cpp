@@ -2,6 +2,14 @@
 
 #include <GL/glew.h>
 #include <iostream>
+#include <ShaderLoader.hpp>
+
+/*
+    TODO NEXT TIME:
+    Make a struct that is a vertex (3 floats) and then make an array of that, where array sizes are adjusted 
+    (vertices will be 4 instead of 12) and then just pass that to opengl and see if it just does everything properly.
+
+*/ 
 
 /**
  * @brief Construct a new Test Scene:: Test Scene object
@@ -14,27 +22,35 @@ TestScene::TestScene() {
 };
 
 void TestScene::setupVBO() {
+    // I want to make a vertex structure that will encompass this particular type of thing properly
+    // I want the abstraction of "each element in the array is a vertex" feel, so that it is easier to think about
+    // This might even mean wrapping the filling of buffers in this structure, but I'm down with it lol
+    // If I make this structure the size of 3 floats, and then just tell opengl to jump a single float ahead or whatever for each point,
+    // will it just work? Need to look in to that
     // Just setting points, all in normal device coords
     // Top right of rectangle "0"
-    vertices[0] = 0.5;
-    vertices[1] = 0.5;
-    vertices[2] = 0;
+    verts[0].x = 0.5;
+    verts[0].y = 0.5;
+    verts[0].z = 0;
+
 
     // Bottom right of rectangle "1"
-    vertices[3] = 0.5;
-    vertices[4] = -0.5;
-    vertices[5] = 0;
+    verts[1].x = 0.5;
+    verts[1].y = -0.5;
+    verts[1].z = 0;
 
     // Bottom left of rectangle "2"
-    vertices[6] = -0.5;
-    vertices[7] = -0.5;
-    vertices[8] = 0;
+    verts[2].x = -0.5;
+    verts[2].y = -0.5;
+    verts[2].z = 0;
 
     // Top left of rectangle "3"
-    vertices[9] = -0.5;
-    vertices[10] = 0.5;
-    vertices[11] = 0;
+    verts[3].x = -0.6;
+    verts[3].y = 0.5;
+    verts[3].z = 0;
 
+    // Said lib mentioned above should also have a way of easily getting indecies, I think
+    // I need to work with this more to figure out where things can be simplified for ebos
     // Now we order the vertecies in the order they will connect, essentially
     // First 3 are the first triangle of the rectangle
     eboIndecies[0] = 0;
@@ -66,7 +82,7 @@ void TestScene::setupVBO() {
     // • GL_STATIC_DRAW: the data is set only once and used many times.
     // • GL_DYNAMIC_DRAW: the data is changed a lot and used many times.
     // If something is changed a lot on draw, then we will want to tell the GPU that so it can optimize
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
     // Setup the ebo which allows us to use indecies on the vertex array so we don't need to send multiople of the same vertex
     // Setup is the same as all other buffers as explained above
@@ -90,48 +106,10 @@ void TestScene::setupVBO() {
                           (void*)0); // The offset of the start of the buffer
     glEnableVertexAttribArray(0);// Pass the vertex attrib location (first arg of glVertexAttribPointer)
 
-    // Loading shaders and stuff
-    // Just like other calls, this will create an ID associated to the shader
-    vShader = glCreateShader(GL_VERTEX_SHADER);
-    // This will link the source of the shader to the ID
-    glShaderSource(vShader, 1, &vertexShaderSource, NULL);
-    // This does the compilations
-    glCompileShader(vShader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(vShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" <<
-        infoLog << std::endl;
-    }
-
-    fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShader, 1, &fragShaderSource, NULL);
-    glCompileShader(fShader);
-    // For both of the things above we can check for compilation errors, skipping for now
-    glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(fShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAG::COMPILATION_FAILED\n" <<
-        infoLog << std::endl;
-    }
-
-    shaderProg = glCreateProgram();
-    glAttachShader(shaderProg, vShader);
-    glAttachShader(shaderProg, fShader);
-    glLinkProgram(shaderProg);
-    // We can also check for linking errors above, skipping for now
-    glGetProgramiv(shaderProg, GL_LINK_STATUS, &success);
-    if(!success) {
-        glGetProgramInfoLog(shaderProg, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::LINKING_FAILED\n" <<
-            infoLog << std::endl;
-    }
-
+    shed::ShaderLoader shaderLoader = shed::ShaderLoader();
+    std::string vertPath = "src/shaders/vertex.glsl";
+    std::string fragPath = "src/shaders/fragment.glsl";
+    shaderProg = shaderLoader.CreateProgram(vertPath.c_str(), fragPath.c_str());
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 

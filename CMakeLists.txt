@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.0)
-project(Tetris VERSION 0.1.0)
+project(glRender VERSION 0.1.0)
 set(OpenGL_GL_PREFERENCE "GLVND")
 
 
@@ -14,8 +14,15 @@ link_libraries(${GLEW_LIBRARIES})
 link_libraries(${OPENGL_LIBRARIES})
 link_libraries(${SDL2_LIBRARIES})
 
+add_subdirectory(src/core)
 add_subdirectory(src/init)
 add_subdirectory(src/scenes)
 
 add_executable(main src/main.cpp)
-target_link_libraries(main init scenes ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::OpenGL)
+target_link_libraries(main init scenes core ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::OpenGL)
+
+add_custom_command(
+        TARGET main POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/src/shaders/
+                ${CMAKE_CURRENT_BINARY_DIR}/src/shaders/)
