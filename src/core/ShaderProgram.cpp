@@ -1,14 +1,14 @@
-#include "ShaderLoader.hpp" 
+#include "ShaderProgram.hpp" 
 #include <iostream>
 #include <fstream>
 #include <vector>
  
 using namespace shed;
  
-ShaderLoader::ShaderLoader(void) {}
-ShaderLoader::~ShaderLoader(void) {}
+ShaderProgram::ShaderProgram(void) {}
+ShaderProgram::~ShaderProgram(void) {}
  
-std::string ShaderLoader::ReadShader(const char *filename) {
+std::string ShaderProgram::ReadShader(const std::string& filename) {
     std::string shaderCode;
     std::ifstream file(filename, std::ios::in);
  
@@ -27,7 +27,7 @@ std::string ShaderLoader::ReadShader(const char *filename) {
     return shaderCode;
 }
  
-GLuint ShaderLoader::CreateShader(GLenum shaderType, std::string source, const char* shaderName) {
+GLuint ShaderProgram::CreateShader(GLenum shaderType, const std::string& source, const char* shaderName) {
     int compile_result = 0;
  
     GLuint shader = glCreateShader(shaderType);
@@ -51,10 +51,10 @@ GLuint ShaderLoader::CreateShader(GLenum shaderType, std::string source, const c
     return shader;
 }
  
-GLuint ShaderLoader::CreateProgram(const char* vertexShaderFilename, const char* fragmentShaderFilename) {
+int ShaderProgram::CreateProgram(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename) {
     //read the shader files and save the code
-    std::string vertex_shader_code = ReadShader(vertexShaderFilename);
-    std::string fragment_shader_code = ReadShader(fragmentShaderFilename);
+    std::string vertex_shader_code = ReadShader("src/shaders/" + vertexShaderFilename);
+    std::string fragment_shader_code = ReadShader("src/shaders/" + fragmentShaderFilename);
 
     GLuint vertex_shader = CreateShader(GL_VERTEX_SHADER, vertex_shader_code, (char*)"vertex shader");
     GLuint fragment_shader = CreateShader(GL_FRAGMENT_SHADER, fragment_shader_code, (char*)"fragment shader");
@@ -75,8 +75,33 @@ GLuint ShaderLoader::CreateProgram(const char* vertexShaderFilename, const char*
         std::vector<char> program_log(info_log_length);
         glGetProgramInfoLog(program, info_log_length, NULL, &program_log[0]);
         std::cout << "Shader Loader : LINK ERROR" << std::endl << &program_log[0] << std::endl;
-        return 0;
+        return link_result;
     }
 
-    return program;
+    this->_id = program;
+
+    return 0;
 }
+
+// TODO: I kinda want these helpers to do a bit more than simple wrappers
+// like, maybe having uniforms be compeletely controlled by this class as well
+void ShaderProgram::Use() {
+    glUseProgram(id);
+}
+
+void ShaderProgram::SetUniform(const std::string &name, bool value) {
+    glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
+}
+
+void ShaderProgram::SetUniform(const std::string &name, float value) {
+    glUniform1f(glGetUniformLocation(id, name.c_str()), value);
+}
+
+void ShaderProgram::SetUniform(const std::string &name, int value) {
+    glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+}
+
+void ShaderProgram::SetUniform(const std::string &name, shed::vec4 value) {
+    glUniform4f(glGetUniformLocation(id, name.c_str()), value.x, value.y, value.z, value.w);
+}
+

@@ -1,8 +1,9 @@
 #include "TestScene.hpp"
 
+#include <chrono>
 #include <GL/glew.h>
 #include <iostream>
-#include <ShaderLoader.hpp>
+#include <ShaderProgram.hpp>
 
 /*
     TODO NEXT TIME:
@@ -106,10 +107,11 @@ void TestScene::setupVBO() {
                           (void*)0); // The offset of the start of the buffer
     glEnableVertexAttribArray(0);// Pass the vertex attrib location (first arg of glVertexAttribPointer)
 
-    shed::ShaderLoader shaderLoader = shed::ShaderLoader();
-    std::string vertPath = "src/shaders/vertex.glsl";
-    std::string fragPath = "src/shaders/fragment.glsl";
-    shaderProg = shaderLoader.CreateProgram(vertPath.c_str(), fragPath.c_str());
+    shaders = new shed::ShaderProgram();
+    std::string vertPath = "vertex.glsl";
+    std::string fragPath = "fragment.glsl";
+    shaders->CreateProgram(vertPath, fragPath);
+
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
@@ -136,7 +138,10 @@ void TestScene::notifyDisplayFrame() {
     glClearColor(0.53, 0.81, 0.92, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProg);
+    float timeValue = (float)SDL_GetTicks() / 1000.0;
+    float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+    shaders->Use();
+    shaders->SetUniform("ourColor", shed::vec4(0.0, greenValue, 0.0, 1.0));
     this->renderVBO();
 };
 

@@ -2,26 +2,15 @@
 #include <WindowInfo.hpp>
 #include <IListener.hpp>
 #include <Types.hpp>
+#include <ShaderProgram.hpp>
 
 using namespace Core;
 
 class TestScene : public IListener {
     private:
         Core::WindowInfo windowInfo;
+        shed::ShaderProgram* shaders; 
         // TRIANGLE STUFF //
-        const char *vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        " gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
-
-        const char *fragShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        " FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\0";
 
         // The benefit of the ebo is, originally, we'd have 18 float in this to define 
         // already shared verts, with the ebo and being able to define indecies, we only need

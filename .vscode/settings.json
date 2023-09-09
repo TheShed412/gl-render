@@ -48,6 +48,8 @@
         "ctime": "cpp",
         "list": "cpp",
         "map": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     }
 }
