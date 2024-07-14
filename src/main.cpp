@@ -4,6 +4,7 @@
 
 #include "init/InitSDL.hpp"
 #include "scenes/TestScene.hpp"
+#include "scenes/ImageBufferScene.hpp"
 
 int main(int argc, char **argv)
 {
@@ -18,7 +19,7 @@ int main(int argc, char **argv)
     Core::ContextInfo context(4, 5, true);
 
     Core::Init::InitSDL::init(window, context);
-    Core::IListener* scene = new TestScene(window);
+    Core::IListener* scene = new ImageBufferScene(window);
     Core::Init::InitSDL::setListener(scene);
     Core::Init::InitSDL::run();
     
